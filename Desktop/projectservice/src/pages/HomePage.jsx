@@ -33,9 +33,11 @@ const HomePage = () => {
           Connect with the best service providers near you!
         </p>
         <div className="flex space-x-4">
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 px-4 rounded">
-            Join as Customer
-          </button>
+        <Link to="/login">
+            <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+              Join as Customer
+            </button>
+          </Link>
           <Link to="/login">
             <button className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
               Join as Service Provider
