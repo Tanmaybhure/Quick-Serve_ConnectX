@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
+import Map from 'react-map-gl';
 
 const serviceProviders = {
   plumber: [
@@ -26,11 +27,22 @@ const ServiceProviderPage = () => {
 
   return (
     <div className="bg-gray-800 text-white min-h-screen flex">
-      {/* Left Half of the Page */}
-      <div className="w-1/2 bg-gray-900"></div>
+      {/* Left Half of the Page (Map Section) */}
+      <div className="w-1/2 h-screen">
+        <Map
+          initialViewState={{
+            longitude: 72.8777,  // Longitude of Mumbai
+            latitude: 19.0760,   // Latitude of Mumbai
+            zoom: 12,            // Adjust the zoom level to show a larger area
+          }}
+          style={{ width: "100%", height: "100%" }}
+          mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+          mapStyle="mapbox://styles/mapbox/streets-v9"
+        />
+      </div>
 
-      {/* Right Half of the Page */}
-      <div className="w-1/2 px-6 py-12">
+      {/* Right Half of the Page (Service Provider Cards) */}
+      <div className="w-1/2 px-6 py-12 overflow-y-auto">
         <h2 className="text-3xl font-bold text-center text-yellow-500 mb-12">
           {"Near-By " + service.charAt(0).toUpperCase() + service.slice(1)} Providers
         </h2>

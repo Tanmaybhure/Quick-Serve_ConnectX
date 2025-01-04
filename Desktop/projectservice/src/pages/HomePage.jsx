@@ -1,9 +1,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Map from 'react-map-gl';
 
 const HomePage = () => {
   return (
     <div className="bg-gray-900 text-white min-h-screen">
+
       {/* Navbar */}
       <nav className="bg-gray-800 p-4 shadow-md">
         <div className="container mx-auto flex justify-between items-center">
@@ -32,6 +34,20 @@ const HomePage = () => {
           </ul>
         </div>
       </nav>
+
+      {/* Map Section */}
+      <div className="h-96">
+        <Map
+          initialViewState={{
+            longitude: 72.8777,  // Longitude of Mumbai
+            latitude: 19.0760,   // Latitude of Mumbai
+            zoom: 10,            // Adjust the zoom level for better view
+          }}
+          style={{ width: "100%", height: "100%" }}
+          mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
+          mapStyle="mapbox://styles/mapbox/streets-v9"
+        />
+      </div>
 
       {/* Hero Section */}
       <div className="flex flex-col items-center justify-center text-center py-20 bg-gray-800 shadow-lg">
