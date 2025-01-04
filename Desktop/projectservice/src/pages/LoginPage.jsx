@@ -1,12 +1,61 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate(); 
+  console.log("login page");
+  const handleLogin = async (e) => {
+    e.preventDefault(); 
+
+    try {
+      const response = await fetch("http://localhost:8080/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSuccessMessage("Login successful!");
+        setErrorMessage("");
+        console.log("Login Response:", data);
+        navigate("/servicePage");
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Login failed.");
+        setSuccessMessage("");
+        navigate("/login");
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      setErrorMessage("An error occurred. Please try again.");
+      setSuccessMessage("");
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="bg-gray-900 text-white min-h-screen flex justify-center items-center">
       <div className="bg-opacity-50 bg-navy-900 p-8 rounded-lg w-full max-w-sm shadow-lg">
         <h2 className="text-3xl font-bold text-center mb-8">Login</h2>
 
-        <form>
+        {errorMessage && (
+          <div className="bg-red-500 text-white p-3 rounded mb-4">
+            {errorMessage}
+          </div>
+        )}
+        {successMessage && (
+          <div className="bg-green-500 text-white p-3 rounded mb-4">
+            {successMessage}
+          </div>
+        )}
+
+        <form onSubmit={handleLogin}>
           {/* Email Input */}
           <div className="mb-6">
             <label className="block text-sm font-medium mb-2" htmlFor="email">
@@ -16,8 +65,11 @@ const LoginPage = () => {
               type="email"
               id="email"
               name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 rounded-lg bg-transparent border border-gray-700 text-white focus:outline-none focus:border-yellow-500"
               placeholder="Enter your email"
+              required
             />
           </div>
 
@@ -30,8 +82,11 @@ const LoginPage = () => {
               type="password"
               id="password"
               name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full p-3 rounded-lg bg-transparent border border-gray-700 text-white focus:outline-none focus:border-yellow-500"
               placeholder="Enter your password"
+              required
             />
           </div>
 

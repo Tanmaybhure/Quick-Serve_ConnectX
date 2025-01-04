@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashBoardPage";
 import ServicesPage from './pages/ServicesPage';
 import ServiceProviderPage from './pages/ServiceProviderPage';
+import DemoMap from './pages/DemoMap';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/servicepage" element={<ServicesPage/>} />
         <Route path="/service-provider/:service" element={<ServiceProviderPage />} />
+        <Route path="/demomap" element={<DemoMap />} />
       </Routes>
     </Router>
   );
