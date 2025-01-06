@@ -1,3 +1,4 @@
+// 
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -17,11 +18,11 @@ const SignupPage = () => {
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       setSuccessMessage("");
-      navigate("/signup");
+      return; // Prevent further execution
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/signup", {
+      const response = await fetch(process.env.REACT_APP_API_URL + "/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,7 +39,6 @@ const SignupPage = () => {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Signup failed.");
         setSuccessMessage("");
-        navigate("/signup");
       }
     } catch (error) {
       console.error("Error signing up:", error);
