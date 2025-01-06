@@ -2,6 +2,7 @@ package com.project.projectService.Controller;
 
 import com.project.projectService.DTO.LoginRequest;
 import com.project.projectService.DTO.SignUpRequest;
+import com.project.projectService.DTO.locationServiceProviderDTO;
 import com.project.projectService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,5 +26,12 @@ public class loginController {
     public boolean signup(@RequestBody SignUpRequest signUpRequest){
         System.out.println(signUpRequest.toString());
         return userService.saveUser(signUpRequest) != null;
+    }
+    @PostMapping("/service-provider-location")
+    public boolean saveServiceProviderlocation(@RequestBody locationServiceProviderDTO location){
+        String latitude= location.getLatitude();
+        String longitude= location.getLongitude();
+        System.out.println(latitude+" "+longitude);
+        return (latitude!=null && longitude != null)? true:null;
     }
 }
