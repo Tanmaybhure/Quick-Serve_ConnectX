@@ -1,5 +1,6 @@
 package com.project.projectService.Service;
 
+import com.project.projectService.DTO.LoginRequest;
 import com.project.projectService.DTO.SignUpRequest;
 import com.project.projectService.Model.Customer;
 import com.project.projectService.Repository.customerRepository;
@@ -17,5 +18,12 @@ public class UserService {
         newUser.setlName(user.getlName());
         newUser.setPassWord(user.getPassWord());
         return repo.save(newUser);
+    }
+
+    public Customer login(LoginRequest user){
+        return repo.findByEmailAndPassWord(user.getEmail(), user.getPassword());
+    }
+    public Customer getUserByEmail(String email){
+        return repo.findByEmail(email);  // This method must be defined in the repository
     }
 }

@@ -1,9 +1,6 @@
 package com.project.projectService.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Customer {
@@ -13,6 +10,7 @@ public class Customer {
     private String fName;
     private String lName;
     private String email;
+    @Column(name = "pass_word")
     private String passWord;
 
     public Long getId() {
@@ -55,4 +53,5 @@ public class Customer {
     public void setPassWord(String passWord) {
         this.passWord = passWord;
     }
+
 }
