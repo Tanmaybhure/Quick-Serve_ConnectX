@@ -1,26 +1,28 @@
-import React, { useState } from 'react';
-import { Map, Marker } from 'react-map-gl';
+import React, { useState, useEffect } from 'react';
+import { Map, useMap } from 'react-map-gl';
 
 const DemoMap = () => {
   const mapboxAccessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
 
-  // State to store the selected latitude and longitude
-  const [selectedLocation, setSelectedLocation] = useState(null);
+  // State to store the center latitude and longitude
+  const [centerLocation, setCenterLocation] = useState({
+    lat: 19.12826639470724, // Initial latitude of Mumbai
+    lng: 72.8437387217702,  // Initial longitude of Mumbai
+  });
 
   if (!mapboxAccessToken) {
     return <div>Mapbox access token is missing or invalid.</div>;
   }
 
-  // Handle the map click event to capture the latitude and longitude
-  const handleMapClick = (event) => {
-    const { lngLat } = event;
-    const { lat, lng } = lngLat;
-    setSelectedLocation({ lat, lng });
+  // Update the center location when the map moves
+  const handleMapMove = ({ viewState }) => {
+    const { latitude, longitude } = viewState;
+    setCenterLocation({ lat: latitude, lng: longitude });
   };
 
-  // Handle the submit action to send the selected latitude and longitude to the backend
+  // Handle the submit action to send the center latitude and longitude to the backend
   const handleSubmit = async () => {
-    if (selectedLocation) {
+    if (centerLocation) {
       try {
         const response = await fetch('http://localhost:8080/api/service-provider-location', {
           method: 'POST',
@@ -28,8 +30,8 @@ const DemoMap = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            latitude: selectedLocation.lat,
-            longitude: selectedLocation.lng,
+            latitude: centerLocation.lat,
+            longitude: centerLocation.lng,
           }),
         });
 
@@ -40,8 +42,6 @@ const DemoMap = () => {
         console.error('Error sending location to backend:', error);
         alert('Failed to save location');
       }
-    } else {
-      alert('Please select a location on the map first!');
     }
   };
 
@@ -49,34 +49,36 @@ const DemoMap = () => {
     <div>
       <Map
         initialViewState={{
-          longitude: 72.8437387217702,  // Longitude of Mumbai
-          latitude: 19.12826639470724,   // Latitude of Mumbai
+          longitude: centerLocation.lng,
+          latitude: centerLocation.lat,
           zoom: 15,
         }}
         style={{ width: "100vw", height: "100vh" }}
         mapboxAccessToken={mapboxAccessToken}
         mapStyle="mapbox://styles/mapbox/streets-v11"
-        onClick={handleMapClick} // Adding the onClick handler
+        onMove={handleMapMove} // Updating the center location on move
         onError={(error) => {
           console.error("Map error:", error);
         }}
       >
-        {/* Place the marker on the map if a location is selected */}
-        {selectedLocation && (
-          <Marker latitude={selectedLocation.lat} longitude={selectedLocation.lng}>
-            {/* Custom Marker: Red Circle */}
-            <div style={{
-              backgroundColor: 'green',
-              width: '20px',
-              height: '20px',
-              borderRadius: '50%',
-              border: '2px solid white',  // Optional, for a better marker look
-            }} />
-          </Marker>
-        )}
+        {/* Center pin: A custom marker at the center of the map */}
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -100%)', // Adjust for pin positioning
+            backgroundColor: 'green',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            border: '2px solid white',
+            pointerEvents: 'none', // Prevent interaction with the pin
+          }}
+        />
       </Map>
 
-      {/* Button to submit selected location */}
+      {/* Button to submit the center location */}
       <div className="absolute top-10 left-10 bg-white p-4 rounded shadow">
         <button
           onClick={handleSubmit}
@@ -85,14 +87,6 @@ const DemoMap = () => {
           Submit Location
         </button>
       </div>
-
-      {/* Display the selected latitude and longitude */}
-      {/* {selectedLocation && (
-        <div className="absolute top-20 left-10 bg-white p-4 rounded shadow">
-          <p><strong>Latitude:</strong> {selectedLocation.lat}</p>
-          <p><strong>Longitude:</strong> {selectedLocation.lng}</p>
-        </div>
-      )} */}
     </div>
   );
 };

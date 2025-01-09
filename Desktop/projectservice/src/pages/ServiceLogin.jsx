@@ -14,7 +14,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/api/login", {
+      const response = await fetch("http://localhost:8080/api/login-service", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,7 +25,7 @@ const LoginPage = () => {
         const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        navigate("/servicePage");
+        navigate("/demomap");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Login failed.");
@@ -40,7 +40,7 @@ const LoginPage = () => {
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white min-h-screen flex justify-center items-center">
       <div className="bg-opacity-90 bg-gray-800 p-8 rounded-lg w-full max-w-sm shadow-2xl">
-        <h2 className="text-4xl font-bold text-center mb-8 text-teal-400">Customer Login</h2>
+        <h2 className="text-4xl font-bold text-center mb-8 text-teal-400">Service Login</h2>
 
         {errorMessage && (
           <div className="bg-red-500 text-white p-3 rounded mb-4">
@@ -98,7 +98,7 @@ const LoginPage = () => {
               Forgot Password?
             </a>
             <a
-              href="/signup"
+              href="/servicesignup"
               className="text-sm text-teal-400 hover:underline"
             >
               Sign Up

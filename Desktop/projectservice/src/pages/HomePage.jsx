@@ -43,10 +43,24 @@ const HomePage = () => {
             latitude: 19.076, // Latitude of Mumbai
             zoom: 12.5, // Adjust the zoom level for better view
           }}
-          style={{ width: "100%", height: "80%" }}
+          style={{ width: "100%", height: "75%" }}
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
           mapStyle="mapbox://styles/mapbox/dark-v10">
         </Map>
+        <div
+          style={{
+            position: 'absolute',
+            left: '50%',
+            top: '35%',
+            transform: 'translate(-50%, -100%)', // Adjust for pin positioning
+            backgroundColor: 'black',
+            width: '10px',
+            height: '10px',
+            borderRadius: '50%',
+            border: '1px solid white',
+            pointerEvents: 'none', // Prevent interaction with the pin
+          }}
+        />
       </div>
 
       {/* Hero Section */}
@@ -64,7 +78,7 @@ const HomePage = () => {
               Join as Customer
             </button>
           </Link>
-          <Link to="/login">
+          <Link to="/servicesignup">
             <button className="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-8 rounded-full shadow-xl transition">
               Join as Service Provider
             </button>

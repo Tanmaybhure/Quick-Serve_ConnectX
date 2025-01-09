@@ -6,7 +6,6 @@ const DashBoardPage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true); // Assume user is logged in
   const [profileOptionsVisible, setProfileOptionsVisible] = useState(false);
 
-  // Timer function to countdown from 10 minutes
   useEffect(() => {
     if (timer <= 0) return;
 
@@ -28,29 +27,27 @@ const DashBoardPage = () => {
   };
 
   return (
-    <div className="bg-gray-800 min-h-screen text-white">
-      {/* Navbar */}
-      <nav className="flex justify-between items-center bg-gray-900 p-6">
+    <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black min-h-screen text-white">
+      <nav className="flex justify-between items-center bg-opacity-90 bg-gray-800 p-6 shadow-lg">
         <div className="flex items-center space-x-4">
           <img
-            src="https://via.placeholder.com/40" // Placeholder for profile logo
+            src="https://via.placeholder.com/40"
             alt="Profile"
             className="w-10 h-10 rounded-full cursor-pointer"
             onClick={handleProfileClick}
           />
           <div>
-            <h1 className="text-xl font-bold">John Doe</h1>
-            <p className="text-sm text-gray-400">Plumber</p>
+            <h1 className="text-xl font-bold text-teal-400">John Doe</h1>
+            <p className="text-sm text-gray-300">Plumber</p>
           </div>
         </div>
 
-        {/* Profile Options Dropdown */}
         {profileOptionsVisible && (
-          <div className="absolute top-20 right-6 bg-gray-900 p-4 rounded-md shadow-lg w-48">
+          <div className="absolute top-20 right-6 bg-gray-800 p-4 rounded-md shadow-lg w-48">
             <ul>
-              <li className="mb-3 cursor-pointer hover:text-yellow-500">Edit Profile</li>
+              <li className="mb-3 cursor-pointer hover:text-teal-400">Edit Profile</li>
               <li
-                className="cursor-pointer hover:text-yellow-500"
+                className="cursor-pointer hover:text-teal-400"
                 onClick={() => setIsLoggedIn(false)}
               >
                 Logout
@@ -60,38 +57,34 @@ const DashBoardPage = () => {
         )}
       </nav>
 
-      {/* Dashboard Content */}
       <div className="container mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold mb-8">Dashboard</h2>
+        <h2 className="text-3xl font-bold text-teal-400 mb-8">Dashboard</h2>
 
-        {/* History */}
         <section className="mb-12">
-          <h3 className="text-2xl font-semibold mb-4">History</h3>
+          <h3 className="text-2xl font-semibold text-teal-400 mb-4">History</h3>
           <div className="space-y-4">
-            <div className="bg-gray-700 p-4 rounded-lg shadow-md">
-              <p className="text-lg font-bold">Service History 1</p>
-              <p className="text-gray-400">Details of the service request...</p>
+            <div className="bg-opacity-80 bg-gray-800 p-4 rounded-lg shadow-md">
+              <p className="text-lg font-bold text-teal-400">Service History 1</p>
+              <p className="text-gray-300">Details of the service request...</p>
             </div>
-            <div className="bg-gray-700 p-4 rounded-lg shadow-md">
-              <p className="text-lg font-bold">Service History 2</p>
-              <p className="text-gray-400">Details of the service request...</p>
+            <div className="bg-opacity-80 bg-gray-800 p-4 rounded-lg shadow-md">
+              <p className="text-lg font-bold text-teal-400">Service History 2</p>
+              <p className="text-gray-300">Details of the service request...</p>
             </div>
           </div>
         </section>
 
-        {/* Contact Us */}
         <section className="mb-12">
-          <h3 className="text-2xl font-semibold mb-4">Contact Us</h3>
-          <p className="text-gray-400">Email: support@servicefinder.com</p>
-          <p className="text-gray-400">Phone: +123 456 7890</p>
+          <h3 className="text-2xl font-semibold text-teal-400 mb-4">Contact Us</h3>
+          <p className="text-gray-300">Email: support@servicefinder.com</p>
+          <p className="text-gray-300">Phone: +123 456 7890</p>
         </section>
 
-        {/* Service Request Cards */}
         <section>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-gray-700 p-6 rounded-lg shadow-lg border border-gray-600">
+            <div className="bg-opacity-80 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-600">
               <div className="flex justify-between items-center mb-4">
-                <h4 className="text-xl font-bold text-white">Customer Name</h4>
+                <h4 className="text-xl font-bold text-teal-400">Customer Name</h4>
                 <div className="flex items-center space-x-2">
                   <div className="text-green-500">✔️</div>
                   <div className="text-red-500">❌</div>
@@ -102,8 +95,8 @@ const DashBoardPage = () => {
               <p className="text-gray-300 mb-4">Message: Need plumbing assistance</p>
 
               <div className="flex justify-between items-center">
-                <div className="text-gray-400">Time Remaining: {formatTime(timer)}</div>
-                <button className="bg-yellow-500 text-black px-4 py-2 rounded-lg hover:bg-yellow-600">
+                <div className="text-gray-300">Time Remaining: {formatTime(timer)}</div>
+                <button className="bg-teal-500 text-black px-4 py-2 rounded-lg hover:bg-teal-600">
                   Accept
                 </button>
               </div>

@@ -22,7 +22,7 @@ const ServiceSignin = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:8080/api/signup", {
+      const response = await fetch("http://localhost:8080/api/signup-service", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -32,20 +32,21 @@ const ServiceSignin = () => {
           firstName,
           lastName,
           password,
+          serviceType,
         }),
       });
       if (response.ok) {
         const data = await response.json();
         setSuccessMessage("Signup successful!");
         setErrorMessage("");
-        navigate("/login");
+        navigate("/servicelogin");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Signup failed.");
         setSuccessMessage("");
       }
     } catch (error) {
-      setErrorMessage("Invalid Credentials!");
+      setErrorMessage("An error occurred. Please try again.");
       setSuccessMessage("");
     }
   };
@@ -160,6 +161,27 @@ const ServiceSignin = () => {
               />
             </div>
 
+            <div>
+              <label
+                className="block text-sm font-medium mb-2 text-gray-300"
+                htmlFor="serviceType"
+              >
+                Service Type
+              </label>
+              <select
+                id="serviceType"
+                value={serviceType}
+                onChange={(e) => setServiceType(e.target.value)}
+                className="w-full p-3 rounded-lg bg-black border border-gray-600 focus:outline-none focus:ring-2 focus:ring-teal-400 text-white placeholder-gray-400"
+                required
+              >
+                <option value="">Select your service type</option>
+                <option value="doctor">Doctor</option>
+                <option value="carpenter">Carpenter</option>
+                <option value="plumber">Plumber</option>
+                <option value="mechanics">Mechanics</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex space-x-4 mt-6">
@@ -171,7 +193,7 @@ const ServiceSignin = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/servicelogin")}
               className="flex-1 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition shadow-lg"
             >
               Login

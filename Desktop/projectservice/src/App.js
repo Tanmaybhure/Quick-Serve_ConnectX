@@ -9,6 +9,8 @@ import ServicesPage from './pages/ServicesPage';
 import ServiceProviderPage from './pages/ServiceProviderPage';
 import DemoMap from './pages/DemoMap';
 import SignupPage from './pages/SignupPage';
+import ServiceSignin from './pages/ServiceSignin';
+import ServiceLogin from './pages/ServiceLogin'; 
 
 function App() {
   return (
@@ -19,6 +21,8 @@ function App() {
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/servicepage" element={<ServicesPage/>} />
+        <Route path="/servicesignup" element={<ServiceSignin/>} />
+        <Route path="/servicelogin" element={<ServiceLogin />} />
         <Route path="/service-provider/:service" element={<ServiceProviderPage />} />
         <Route path="/demomap" element={<DemoMap />} />
       </Routes>
