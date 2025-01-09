@@ -1,9 +1,6 @@
 package com.project.projectService.Model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 
 @Entity
 public class Customer {
@@ -12,6 +9,7 @@ public class Customer {
     private Long id;
     private String fName;
     private String lName;
+    @Column(unique = true)
     private String email;
     private String passWord;
 

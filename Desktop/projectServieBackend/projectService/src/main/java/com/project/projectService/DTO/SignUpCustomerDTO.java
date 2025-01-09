@@ -2,7 +2,7 @@ package com.project.projectService.DTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class SignUpRequest {
+public class SignUpCustomerDTO {
     @JsonProperty("firstName")
     private String fName;
     @JsonProperty("lastName")

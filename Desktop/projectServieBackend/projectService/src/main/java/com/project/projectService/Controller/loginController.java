@@ -1,8 +1,11 @@
 package com.project.projectService.Controller;
 
 import com.project.projectService.DTO.LoginRequest;
-import com.project.projectService.DTO.SignUpRequest;
+import com.project.projectService.DTO.SignUpCustomerDTO;
+import com.project.projectService.DTO.SignUpServiceProviderDTO;
 import com.project.projectService.DTO.locationServiceProviderDTO;
+import com.project.projectService.Model.Customer;
+import com.project.projectService.Model.ServiceProvider;
 import com.project.projectService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,16 +19,21 @@ public class loginController {
     @Autowired
     UserService userService;
     @PostMapping("/login")
-    public Boolean loginDemo(@RequestBody LoginRequest loginRequest){
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
-        System.out.println(email+" "+password);
-        return  null;
+    public Customer loginCustomer(@RequestBody LoginRequest loginRequest){
+        return userService.authCheckService(loginRequest);
+    }
+    @PostMapping("/login-service")
+    public ServiceProvider loginService(@RequestBody LoginRequest loginRequest){
+        return userService.authCheckServiceProvider(loginRequest);
     }
     @PostMapping("/signup")
-    public boolean signup(@RequestBody SignUpRequest signUpRequest){
-        System.out.println(signUpRequest.toString());
-        return userService.saveUser(signUpRequest) != null;
+    public boolean signup(@RequestBody SignUpCustomerDTO signUpCustomerDTO){
+        System.out.println(signUpCustomerDTO.toString());
+        return userService.saveUser(signUpCustomerDTO) != null;
+    }
+    @PostMapping("/signup-service")
+    public boolean signupService(@RequestBody SignUpServiceProviderDTO signUpServiceProviderDTO){
+        return userService.saveServiceProvider(signUpServiceProviderDTO) !=null ;
     }
     @PostMapping("/service-provider-location")
     public boolean saveServiceProviderlocation(@RequestBody locationServiceProviderDTO location){
