@@ -6,21 +6,22 @@ import com.project.projectService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @RequestMapping("/api")
 @RestController
-public class loginController {
+public class LoginController {
 
     @Autowired
     private UserService userService;
 
     // Login endpoint
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
         System.out.println("Login attempt with email: " + email + " and password: " + password);
@@ -30,11 +31,34 @@ public class loginController {
 
         if (customer != null && customer.getPassWord().equals(password)) {
             // Login successful
+            session.setAttribute("username", customer.getEmail());
+            session.setAttribute("customerId", customer.getId());
+
+            // Debugging: Check if username is set in session
+            System.out.println("Session attributes after login:");
+            System.out.println("Username from session: " + session.getAttribute("username"));
+            System.out.println("Customer ID from session: " + session.getAttribute("customerId"));
+
             return ResponseEntity.ok(new CustomerDTO(customer.getId(), customer.getfName(), customer.getlName(), customer.getEmail()));
         } else {
             // Invalid login credentials
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse("Invalid email or password"));
         }
+    }
+
+    @GetMapping("/session-check")
+    public ResponseEntity<Map<String, Object>> sessionCheck(HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+        String username = (String) session.getAttribute("username");
+
+        if (username != null) {
+            response.put("loggedIn", true);
+            response.put("username", username);
+        } else {
+            response.put("loggedIn", false);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     // Signup endpoint

@@ -8,7 +8,7 @@ public class ProjectServiceApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ProjectServiceApplication.class, args);
-		System.out.println("Application started");
+		System.out.println("Application started...");
 	}
 
 }

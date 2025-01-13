@@ -1,7 +1,8 @@
-import React from "react";
-import { useParams } from "react-router-dom";
-import Map from 'react-map-gl';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import Map from "react-map-gl";
 
+// Sample data for service providers
 const serviceProviders = {
   plumber: [
     { name: "John Plumber", address: "123 Main St, City", rating: 4.5, distance: "2.5 km" },
@@ -23,7 +24,35 @@ const serviceProviders = {
 
 const ServiceProviderPage = () => {
   const { service } = useParams(); // Get the service type from the URL
-  const providers = serviceProviders[service] || [];
+  const navigate = useNavigate();
+  const [providers, setProviders] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check session on component mount
+  useEffect(() => {
+    fetch("http://localhost:8080/api/session-check", {
+      method: "GET",
+      credentials: "include", // Ensures cookies are sent with the request
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.loggedIn) {
+          setIsLoggedIn(true);
+          // Populate the service providers based on the service type
+          setProviders(serviceProviders[service] || []);
+        } else {
+          navigate("/login"); // Redirect to login if not logged in
+        }
+      })
+      .catch(error => {
+        console.error("Error checking session:", error);
+        navigate("/login");
+      });
+  }, [service, navigate]);
+
+  if (!isLoggedIn) {
+    return <div>Loading...</div>; // Or you can show a loading spinner here
+  }
 
   return (
     <div className="bg-gray-800 text-white min-h-screen flex">

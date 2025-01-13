@@ -25,7 +25,6 @@ const LoginPage = () => {
         const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        sessionStorage.setItem("user", JSON.stringify(data.customer)); 
         navigate("/servicePage");
       } else {
         const errorData = await response.json();
