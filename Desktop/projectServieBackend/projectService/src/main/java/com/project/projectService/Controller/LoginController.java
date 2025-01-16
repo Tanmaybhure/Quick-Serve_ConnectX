@@ -1,12 +1,17 @@
 package com.project.projectService.Controller;
 
 import com.project.projectService.DTO.*;
+import com.project.projectService.Jwt.JwtService;
 import com.project.projectService.Model.Customer;
 import com.project.projectService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
@@ -17,48 +22,26 @@ import java.util.Map;
 public class LoginController {
 
     @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private JwtService jwtService;
+    @Autowired
     private UserService userService;
+    @Autowired
+    private AuthenticationManagerBuilder authenticationManagerBuilder;
 
     // Login endpoint
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody LoginRequest loginRequest, HttpSession session) {
-        String email = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
-        System.out.println("Login attempt with email: " + email + " and password: " + password);
-
-        // Fetch the customer by email
-        Customer customer = userService.getUserByEmail(email);
-
-        if (customer != null && customer.getPassWord().equals(password)) {
-            // Login successful
-            session.setAttribute("username", customer.getEmail());
-            session.setAttribute("customerId", customer.getId());
-
-            // Debugging: Check if username is set in session
-            System.out.println("Session attributes after login:");
-            System.out.println("Username from session: " + session.getAttribute("username"));
-            System.out.println("Customer ID from session: " + session.getAttribute("customerId"));
-
-            return ResponseEntity.ok(new CustomerDTO(customer.getId(), customer.getfName(), customer.getlName(), customer.getEmail()));
-        } else {
-            // Invalid login credentials
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new LoginResponse("Invalid email or password"));
+    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
+        try{
+            Authentication authentication =authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword()));
+            Customer customer = userService.getUserByEmail(loginRequest.getEmail());
+            String token=jwtService.generateAccessToken(customer.getEmail());
+            return new ResponseEntity<>(token, HttpStatus.OK);
         }
-    }
-
-    @GetMapping("/session-check")
-    public ResponseEntity<Map<String, Object>> sessionCheck(HttpSession session) {
-        Map<String, Object> response = new HashMap<>();
-        String username = (String) session.getAttribute("username");
-
-        if (username != null) {
-            response.put("loggedIn", true);
-            response.put("username", username);
-        } else {
-            response.put("loggedIn", false);
+        catch(Exception e){
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
-
-        return ResponseEntity.ok(response);
     }
 
     // Signup endpoint

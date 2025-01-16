@@ -25,5 +25,8 @@ public class UserService {
     }
     public Customer getUserByEmail(String email){
         return repo.findByEmail(email);  // This method must be defined in the repository
+
     }
+
+
 }
