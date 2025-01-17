@@ -1,5 +1,3 @@
-// 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -21,14 +19,17 @@ const LoginPage = () => {
         },
         body: JSON.stringify({ email, password }),
       });
+
+      const data = await response.json(); // Handle the response
+
       if (response.ok) {
-        const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        navigate("/servicePage");
+        // Save the token to localStorage or state
+        localStorage.setItem("token", data.token);
+        navigate("/servicePage"); // Redirect after successful login
       } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || "Login failed.");
+        setErrorMessage(data.message || "Login failed.");
         setSuccessMessage("");
       }
     } catch (error) {

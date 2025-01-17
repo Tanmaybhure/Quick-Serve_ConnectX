@@ -32,17 +32,20 @@ public class LoginController {
 
     // Login endpoint
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest loginRequest) {
-        try{
-            Authentication authentication =authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword()));
-            Customer customer = userService.getUserByEmail(loginRequest.getEmail());
-            String token=jwtService.generateAccessToken(customer.getEmail());
-            return new ResponseEntity<>(token, HttpStatus.OK);
-        }
-        catch(Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
+        Customer customer = userService.login(loginRequest);
+        if (customer != null) {
+            String token = jwtService.generateAccessToken(customer.getEmail());
+            Map<String, String> response = new HashMap<>();
+            response.put("token", token);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "Invalid email or password");
+            return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
         }
     }
+
 
     // Signup endpoint
     @PostMapping("/signup")
