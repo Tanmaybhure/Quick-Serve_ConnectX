@@ -1,12 +1,28 @@
-package com.project.projectService.DTO;
+package com.project.projectService.Model.postSQLModel;
 
-public class locationServiceProviderDTO {
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "location_service_provider")
+public class locationServiceProvider {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String email;
     private String latitude;
     private String longitude;
 
+
     public String getLatitude() {
         return latitude;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {

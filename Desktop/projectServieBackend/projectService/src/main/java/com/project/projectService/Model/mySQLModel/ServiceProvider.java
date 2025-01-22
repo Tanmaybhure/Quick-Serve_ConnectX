@@ -1,4 +1,4 @@
-package com.project.projectService.Model;
+package com.project.projectService.Model.mySQLModel;
 
 import jakarta.persistence.*;
 

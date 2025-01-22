@@ -4,8 +4,8 @@ import com.project.projectService.DTO.LoginRequest;
 import com.project.projectService.DTO.SignUpCustomerDTO;
 import com.project.projectService.DTO.SignUpServiceProviderDTO;
 import com.project.projectService.DTO.locationServiceProviderDTO;
-import com.project.projectService.Model.Customer;
-import com.project.projectService.Model.ServiceProvider;
+import com.project.projectService.Model.mySQLModel.Customer;
+import com.project.projectService.Model.mySQLModel.ServiceProvider;
 import com.project.projectService.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +37,6 @@ public class loginController {
     }
     @PostMapping("/service-provider-location")
     public boolean saveServiceProviderlocation(@RequestBody locationServiceProviderDTO location){
-        String latitude= location.getLatitude();
-        String longitude= location.getLongitude();
-        System.out.println(latitude+" "+longitude);
-        return (latitude!=null && longitude != null)? true:null;
+        return userService.saveLocationPg(location) != null;
     }
 }

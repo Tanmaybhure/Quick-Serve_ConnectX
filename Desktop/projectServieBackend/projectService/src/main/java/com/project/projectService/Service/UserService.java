@@ -3,10 +3,13 @@ package com.project.projectService.Service;
 import com.project.projectService.DTO.LoginRequest;
 import com.project.projectService.DTO.SignUpCustomerDTO;
 import com.project.projectService.DTO.SignUpServiceProviderDTO;
-import com.project.projectService.Model.Customer;
-import com.project.projectService.Model.ServiceProvider;
-import com.project.projectService.Repository.customerRepository;
-import com.project.projectService.Repository.serviceProviderRepository;
+import com.project.projectService.DTO.locationServiceProviderDTO;
+import com.project.projectService.Model.mySQLModel.Customer;
+import com.project.projectService.Model.mySQLModel.ServiceProvider;
+import com.project.projectService.Model.postSQLModel.locationServiceProvider;
+import com.project.projectService.Repository.mySQL.customerRepository;
+import com.project.projectService.Repository.mySQL.serviceProviderRepository;
+import com.project.projectService.Repository.postgreSQL.ServiceLocationPG;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +22,8 @@ public class UserService {
     customerRepository repo;
     @Autowired
     serviceProviderRepository Servicerepo;
+    @Autowired
+    ServiceLocationPG servicePg;
 
     public Customer saveUser(SignUpCustomerDTO user){
         Customer newUser =new Customer();
@@ -50,5 +55,13 @@ public class UserService {
         String password= newUser.getPassword();
         boolean flag = passwordEncoder.matches(user.getPassword(),password);
         return (flag)? newUser: null;
+    }
+
+    public locationServiceProvider saveLocationPg(locationServiceProviderDTO location){
+        locationServiceProvider newlocation = new locationServiceProvider();
+        newlocation.setEmail(location.getEmail());
+        newlocation.setLatitude(location.getLatitude());
+        newlocation.setLongitude(location.getLongitude());
+        return servicePg.save(newlocation);
     }
 }
