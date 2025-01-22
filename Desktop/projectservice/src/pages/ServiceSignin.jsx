@@ -39,7 +39,7 @@ const ServiceSignin = () => {
         const data = await response.json();
         setSuccessMessage("Signup successful!");
         setErrorMessage("");
-        navigate("/servicelogin");
+        navigate('/demomap', { state: { email } });
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Signup failed.");

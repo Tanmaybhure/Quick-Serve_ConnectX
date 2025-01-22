@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Map, useMap } from 'react-map-gl';
+import { useNavigate } from "react-router-dom";
+import { useLocation } from 'react-router-dom';
 
 const DemoMap = () => {
+  const navigate = useNavigate();
   const mapboxAccessToken = process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
-
+  const location= useLocation();
+  const { email } = location.state || {};
   // State to store the center latitude and longitude
   const [centerLocation, setCenterLocation] = useState({
     lat: 19.12826639470724, // Initial latitude of Mumbai
@@ -30,6 +34,7 @@ const DemoMap = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            email,
             latitude: centerLocation.lat,
             longitude: centerLocation.lng,
           }),
@@ -38,6 +43,7 @@ const DemoMap = () => {
         const data = await response.json();
         console.log('Location saved:', data);
         alert('Location saved successfully!');
+        navigate("/servicelogin")
       } catch (error) {
         console.error('Error sending location to backend:', error);
         alert('Failed to save location');

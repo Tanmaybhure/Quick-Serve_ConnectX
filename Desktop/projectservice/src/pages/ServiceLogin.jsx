@@ -25,7 +25,7 @@ const LoginPage = () => {
         const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        navigate("/demomap");
+        navigate("/dashboard");
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Login failed.");
