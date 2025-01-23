@@ -41,7 +41,7 @@ public class MySQLDataSourceConfig {
             @Qualifier("mysqlDataSource") DataSource dataSource) {
         Map<String, Object> jpaProperties = new HashMap<>();
 //        jpaProperties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
-        jpaProperties.put("hibernate.hbm2ddl.auto", "create");
+        jpaProperties.put("hibernate.hbm2ddl.auto", "update");
         jpaProperties.put("hibernate.show-sql", "true");
         return builder
                 .dataSource(dataSource)

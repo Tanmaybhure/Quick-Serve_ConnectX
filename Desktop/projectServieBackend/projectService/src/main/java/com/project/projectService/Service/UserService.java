@@ -1,9 +1,6 @@
 package com.project.projectService.Service;
 
-import com.project.projectService.DTO.LoginRequest;
-import com.project.projectService.DTO.SignUpCustomerDTO;
-import com.project.projectService.DTO.SignUpServiceProviderDTO;
-import com.project.projectService.DTO.locationServiceProviderDTO;
+import com.project.projectService.DTO.*;
 import com.project.projectService.Model.mySQLModel.Customer;
 import com.project.projectService.Model.mySQLModel.ServiceProvider;
 import com.project.projectService.Model.postSQLModel.locationServiceProvider;
@@ -63,5 +60,11 @@ public class UserService {
         newlocation.setLatitude(location.getLatitude());
         newlocation.setLongitude(location.getLongitude());
         return servicePg.save(newlocation);
+    }
+
+    public customerCurrentLocationDTO getCustomerLocation(customerCurrentLocationDTO location){
+        if(location==null) return null;
+        System.out.println(location.getLatitude()+" "+location.getLongitude());
+        return location;
     }
 }

@@ -1,9 +1,6 @@
 package com.project.projectService.Controller;
 
-import com.project.projectService.DTO.LoginRequest;
-import com.project.projectService.DTO.SignUpCustomerDTO;
-import com.project.projectService.DTO.SignUpServiceProviderDTO;
-import com.project.projectService.DTO.locationServiceProviderDTO;
+import com.project.projectService.DTO.*;
 import com.project.projectService.Model.mySQLModel.Customer;
 import com.project.projectService.Model.mySQLModel.ServiceProvider;
 import com.project.projectService.Service.UserService;
@@ -38,5 +35,9 @@ public class loginController {
     @PostMapping("/service-provider-location")
     public boolean saveServiceProviderlocation(@RequestBody locationServiceProviderDTO location){
         return userService.saveLocationPg(location) != null;
+    }
+    @PostMapping("/update-location")
+    public boolean getCustomerLocation(@RequestBody customerCurrentLocationDTO location){
+        return userService.getCustomerLocation(location) !=null;
     }
 }
