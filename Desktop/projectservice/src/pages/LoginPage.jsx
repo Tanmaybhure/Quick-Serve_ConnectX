@@ -1,5 +1,3 @@
-// 
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -21,11 +19,49 @@ const LoginPage = () => {
         },
         body: JSON.stringify({ email, password }),
       });
+
       if (response.ok) {
         const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        navigate("/servicePage");
+
+        // Fetch user location after login success
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const { latitude, longitude } = position.coords;
+
+              // Send location to the backend
+              fetch("http://localhost:8080/api/update-location", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email, latitude, longitude }),
+              })
+                .then((locationResponse) => {
+                  if (locationResponse.ok) {
+                    console.log("Location updated successfully");
+                    navigate("/servicePage"); // Redirect to service page
+                  } else {
+                    console.error("Error updating location");
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error sending location to the backend:", error);
+                });
+            },
+            (error) => {
+              console.error("User denied location access:", error);
+              // Redirect to the manual location page
+              alert('Please Give Location Permission to go further');
+              navigate("/login");
+            }
+          );
+        } else {
+          console.error("Geolocation is not supported by this browser.");
+          navigate("/demomap");
+        }
       } else {
         const errorData = await response.json();
         setErrorMessage(errorData.message || "Login failed.");
@@ -40,7 +76,9 @@ const LoginPage = () => {
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-900 to-black text-white min-h-screen flex justify-center items-center">
       <div className="bg-opacity-90 bg-gray-800 p-8 rounded-lg w-full max-w-sm shadow-2xl">
-        <h2 className="text-4xl font-bold text-center mb-8 text-teal-400">Customer Login</h2>
+        <h2 className="text-4xl font-bold text-center mb-8 text-teal-400">
+          Customer Login
+        </h2>
 
         {errorMessage && (
           <div className="bg-red-500 text-white p-3 rounded mb-4">
