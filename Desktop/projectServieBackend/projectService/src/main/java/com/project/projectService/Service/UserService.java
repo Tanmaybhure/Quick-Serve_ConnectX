@@ -1,6 +1,7 @@
 package com.project.projectService.Service;
 
 import com.project.projectService.DTO.*;
+import com.project.projectService.Model.NormalModel.customerCurrentLocation;
 import com.project.projectService.Model.mySQLModel.Customer;
 import com.project.projectService.Model.mySQLModel.ServiceProvider;
 import com.project.projectService.Model.postSQLModel.locationServiceProvider;
@@ -8,9 +9,13 @@ import com.project.projectService.Repository.mySQL.customerRepository;
 import com.project.projectService.Repository.mySQL.serviceProviderRepository;
 import com.project.projectService.Repository.postgreSQL.ServiceLocationPG;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -62,9 +67,8 @@ public class UserService {
         return servicePg.save(newlocation);
     }
 
-    public customerCurrentLocationDTO getCustomerLocation(customerCurrentLocationDTO location){
-        if(location==null) return null;
-        System.out.println(location.getLatitude()+" "+location.getLongitude());
-        return location;
+    public ServiceProvider getDashBoardUser(String email){
+        return Servicerepo.findByEmail(email);
     }
+
 }
