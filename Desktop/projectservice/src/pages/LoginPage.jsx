@@ -30,7 +30,8 @@ const LoginPage = () => {
           navigator.geolocation.getCurrentPosition(
             (position) => {
               const { latitude, longitude } = position.coords;
-
+              localStorage.setItem("userLatitude", latitude);
+              localStorage.setItem("userLongitude", longitude);
               // Send location to the backend
               fetch("http://localhost:8080/api/update-location", {
                 method: "POST",

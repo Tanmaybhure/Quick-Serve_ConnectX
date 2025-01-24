@@ -1,65 +1,122 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import Map from 'react-map-gl';
-
-const serviceProviders = {
-  plumber: [
-    { name: "John Plumber", address: "123 Main St, City", rating: 4.5, distance: "2.5 km" },
-    { name: "Emily Plumber", address: "456 Elm St, City", rating: 4.2, distance: "3.0 km" },
-  ],
-  doctor: [
-    { name: "Dr. Smith", address: "123 Medical Ave, City", rating: 5.0, distance: "1.0 km" },
-    { name: "Dr. Green", address: "456 Health Blvd, City", rating: 4.8, distance: "2.0 km" },
-  ],
-  carpenter: [
-    { name: "Mike Carpenter", address: "123 Wood St, City", rating: 4.7, distance: "3.5 km" },
-    { name: "Sarah Carpenter", address: "456 Timber Lane, City", rating: 4.3, distance: "4.0 km" },
-  ],
-  mechanic: [
-    { name: "Tom Mechanic", address: "123 Auto Ave, City", rating: 4.6, distance: "2.8 km" },
-    { name: "Anna Mechanic", address: "456 Garage St, City", rating: 4.4, distance: "3.2 km" },
-  ],
-};
+import Map, { Marker } from "react-map-gl";
+import 'mapbox-gl/dist/mapbox-gl.css'; 
 
 const ServiceProviderPage = () => {
   const { service } = useParams(); // Get the service type from the URL
-  const providers = serviceProviders[service] || [];
+  const [providers, setProviders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const userLatitude= localStorage.getItem("userLatitude")
+  const userLongitude= localStorage.getItem("userLongitude")
+  localStorage.removeItem("userLatitude")
+  localStorage.removeItem("userLongitude")
+  useEffect(() => {
+    const fetchProviders = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/service-providers?service=${service}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const data = await response.json();
+
+        if (Array.isArray(data)) {
+          setProviders(data);
+        } else {
+          console.error("Fetched data is not an array", data);
+        }
+      } catch (error) {
+        console.error("Error fetching service providers:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProviders();
+  }, [service]);
+
+  if (loading) {
+    return <div className="text-center text-white">Loading service providers...</div>;
+  }
 
   return (
     <div className="bg-gray-800 text-white min-h-screen flex">
-      {/* Left Half of the Page (Map Section) */}
+      {/* Left Half: Map Section */}
       <div className="w-1/2 h-screen">
         <Map
           initialViewState={{
-            longitude: 72.8777,  // Longitude of Mumbai
-            latitude: 19.0760,   // Latitude of Mumbai
-            zoom: 12,            // Adjust the zoom level to show a larger area
+            longitude: 73.9115008,
+            latitude: 18.5499648,
+            zoom: 15,
           }}
           style={{ width: "100%", height: "100%" }}
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
           mapStyle="mapbox://styles/mapbox/streets-v9"
-        />
+        >
+          <Marker
+            longitude={73.911}
+            latitude={18.549}
+            anchor="center"
+          >
+            <div
+                style={{
+                  width: "10px",
+                  height: "10px",
+                  backgroundColor: "blue",
+                  borderRadius: "50%", // Makes it a circle
+                }}
+              />
+          </Marker>
+          {/* Custom Red Dot Marker */}
+          {Array.isArray(providers) && providers.map((provider, index) => (
+            <Marker
+                key={index}
+                longitude={provider.longitude}
+                latitude={provider.latitude}
+                anchor="bottom" // Ensures the marker stays at its location relative to the map
+              >
+                <div className="text-lg text-blue-500">📍</div> 
+              </Marker>
+          ))}
+        </Map>
       </div>
 
-      {/* Right Half of the Page (Service Provider Cards) */}
+      {/* Right Half: Service Provider Cards */}
       <div className="w-1/2 px-6 py-12 overflow-y-auto">
         <h2 className="text-3xl font-bold text-center text-yellow-500 mb-12">
-          {"Near-By " + service.charAt(0).toUpperCase() + service.slice(1)} Providers
+          {"Nearby " + service.charAt(0).toUpperCase() + service.slice(1)} Providers
         </h2>
 
-        {/* Service Provider Cards */}
         <div className="space-y-8">
-          {providers.map((provider, index) => (
-            <div
-              key={index}
-              className="bg-gray-700 p-6 rounded-lg shadow-lg cursor-pointer transform transition-all hover:scale-105 hover:shadow-2xl hover:bg-gray-600"
-            >
-              <h3 className="text-2xl font-bold text-white mb-4">{provider.name}</h3>
-              <p className="text-gray-300">{provider.address}</p>
-              <p className="text-yellow-500">Rating: {provider.rating} ★</p>
-              <p className="text-gray-400">Distance: {provider.distance}</p>
-            </div>
-          ))}
+          {Array.isArray(providers) &&
+            providers.map((provider, index) => (
+              
+              <div
+                key={index}
+                className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-2xl transform transition-all duration-300 hover:scale-105 cursor-pointer"
+              >
+                <p className="text-gray-300 mb-2">
+                  <span className="font-semibold text-yellow-500">First Name:</span> {provider.fname}
+                </p>
+                <p className="text-gray-300 mb-2">
+                  <span className="font-semibold text-yellow-500">Last Name:</span> {provider.lname}
+                </p>
+                <p className="text-gray-300 mb-2">
+                  <span className="font-semibold text-yellow-500">Email:</span> {provider.email}
+                </p>
+                <p className="text-gray-300 mb-2">
+                  <span className="font-semibold text-yellow-500">Service:</span> {provider.service}
+                </p>
+                <p className="text-gray-300 mb-2">
+                  <span className="font-semibold text-yellow-500">Distance:</span> {provider.distance}
+                </p>
+                <div className="mt-4">
+                  <button className="bg-yellow-500 text-gray-800 py-2 px-4 rounded-md font-semibold shadow-md hover:bg-yellow-400 transition-all duration-300">
+                    Contact Provider
+                  </button>
+                </div>
+              </div>
+            ))}
         </div>
       </div>
     </div>

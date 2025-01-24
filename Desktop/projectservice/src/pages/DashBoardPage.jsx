@@ -1,25 +1,51 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const DashBoardPage = () => {
-  const [timer, setTimer] = useState(600); // 10 minutes in seconds
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Assume user is logged in
+  const [userData, setUserData] = useState(null);
+  const [serviceHistory, setServiceHistory] = useState([]);
   const [profileOptionsVisible, setProfileOptionsVisible] = useState(false);
+  const navigate = useNavigate();
 
+  
   useEffect(() => {
-    if (timer <= 0) return;
+    // Retrieve the email from localStorage
+    const email = localStorage.getItem("userEmail");
+    if (!email) {
+      navigate("/login"); // Redirect to login if no email is found
+      return;
+    }
 
-    const interval = setInterval(() => {
-      setTimer((prevTimer) => prevTimer - 1);
-    }, 1000);
+    // Fetch user data and service history using the email
+    const fetchData = async () => {
+      try {
+        const userResponse = await fetch(`http://localhost:8080/api/user-details?email=${email}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const user = await userResponse.json();
+        console.log(user);
+        setUserData(user);
 
-    return () => clearInterval(interval);
-  }, [timer]);
+        const historyResponse = await fetch(`http://localhost:8080/api/service-history?email=${email}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const history = await historyResponse.json();
+        setServiceHistory(history);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
 
-  const formatTime = (time) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = time % 60;
-    return `${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`;
+    fetchData();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    // Clear localStorage and redirect to login
+    localStorage.removeItem("userEmail");
+    setUserData(null);
+    navigate("/login");
   };
 
   const handleProfileClick = () => {
@@ -37,8 +63,8 @@ const DashBoardPage = () => {
             onClick={handleProfileClick}
           />
           <div>
-            <h1 className="text-xl font-bold text-teal-400">John Doe</h1>
-            <p className="text-sm text-gray-300">Plumber</p>
+            <h1 className="text-xl font-bold text-teal-400">{userData?.fname+" "+userData?.lname || "Loading..."}</h1>
+            <p className="text-sm text-gray-300">{userData?.service || "Loading..."}</p>
           </div>
         </div>
 
@@ -48,7 +74,7 @@ const DashBoardPage = () => {
               <li className="mb-3 cursor-pointer hover:text-teal-400">Edit Profile</li>
               <li
                 className="cursor-pointer hover:text-teal-400"
-                onClick={() => setIsLoggedIn(false)}
+                onClick={handleLogout}
               >
                 Logout
               </li>
@@ -58,50 +84,54 @@ const DashBoardPage = () => {
       </nav>
 
       <div className="container mx-auto px-6 py-12">
-        <h2 className="text-3xl font-bold text-teal-400 mb-8">Dashboard</h2>
-
+        {/* Personal Card Section */}
         <section className="mb-12">
-          <h3 className="text-2xl font-semibold text-teal-400 mb-4">History</h3>
-          <div className="space-y-4">
-            <div className="bg-opacity-80 bg-gray-800 p-4 rounded-lg shadow-md">
-              <p className="text-lg font-bold text-teal-400">Service History 1</p>
-              <p className="text-gray-300">Details of the service request...</p>
-            </div>
-            <div className="bg-opacity-80 bg-gray-800 p-4 rounded-lg shadow-md">
-              <p className="text-lg font-bold text-teal-400">Service History 2</p>
-              <p className="text-gray-300">Details of the service request...</p>
-            </div>
+          <div className="bg-gray-800 p-6 rounded-lg shadow-lg border border-teal-500">
+            <h2 className="text-3xl font-bold text-teal-400 mb-6">Personal Details</h2>
+            {userData ? (
+              <div className="space-y-4">
+                <p className="text-lg font-semibold text-white">
+                  <span className="text-teal-400">Name:</span> {userData?.fname+" "+userData?.lname}
+                </p>
+                <p className="text-lg font-semibold text-white">
+                  <span className="text-teal-400">Email:</span> {userData.email}
+                </p>
+                <p className="text-lg font-semibold text-white">
+                  <span className="text-teal-400">Service:</span> {userData.service}
+                </p>
+              </div>
+            ) : (
+              <p className="text-gray-300">Loading user details...</p>
+            )}
           </div>
         </section>
 
+        {/* Service History Section */}
+        <section className="mb-12">
+          <h3 className="text-2xl font-semibold text-teal-400 mb-4">Service History</h3>
+          <div className="space-y-4">
+            {serviceHistory.length > 0 ? (
+              serviceHistory.map((history, index) => (
+                <div
+                  key={index}
+                  className="bg-gray-800 p-4 rounded-lg shadow-md border border-gray-600"
+                >
+                  <p className="text-lg font-bold text-teal-400">{history.title}</p>
+                  <p className="text-gray-300">{history.description}</p>
+                  <p className="text-gray-400 text-sm">{history.date}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-300">No service history available.</p>
+            )}
+          </div>
+        </section>
+
+        {/* Contact Us Section */}
         <section className="mb-12">
           <h3 className="text-2xl font-semibold text-teal-400 mb-4">Contact Us</h3>
           <p className="text-gray-300">Email: support@servicefinder.com</p>
           <p className="text-gray-300">Phone: +123 456 7890</p>
-        </section>
-
-        <section>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-opacity-80 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-600">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-xl font-bold text-teal-400">Customer Name</h4>
-                <div className="flex items-center space-x-2">
-                  <div className="text-green-500">✔️</div>
-                  <div className="text-red-500">❌</div>
-                </div>
-              </div>
-              <p className="text-gray-300">Address: 123 Some St, City</p>
-              <p className="text-gray-300">Phone: +987654321</p>
-              <p className="text-gray-300 mb-4">Message: Need plumbing assistance</p>
-
-              <div className="flex justify-between items-center">
-                <div className="text-gray-300">Time Remaining: {formatTime(timer)}</div>
-                <button className="bg-teal-500 text-black px-4 py-2 rounded-lg hover:bg-teal-600">
-                  Accept
-                </button>
-              </div>
-            </div>
-          </div>
         </section>
       </div>
     </div>
