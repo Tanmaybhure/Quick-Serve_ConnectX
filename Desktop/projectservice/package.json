@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@mapbox/mapbox-gl-geocoder": "^5.0.3",
+    "@stomp/stompjs": "^7.0.0",
     "cra-template": "1.2.0",
     "mapbox-gl": "^3.9.2",
     "react": "^18.2.0",
@@ -12,6 +13,8 @@
     "react-map-gl-geocoder": "^2.2.0",
     "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1",
+    "react-toastify": "^11.0.3",
+    "sockjs-client": "^1.6.1",
     "url": "^0.11.4",
     "web-vitals": "^4.2.4"
   },

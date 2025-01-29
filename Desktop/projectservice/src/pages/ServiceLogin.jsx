@@ -25,7 +25,7 @@ const LoginPage = () => {
         const data = await response.json();
         setSuccessMessage("Login successful!");
         setErrorMessage("");
-        localStorage.setItem("userEmail", email);
+        localStorage.setItem("userEmailsp", email);
         navigate("/dashboard");
       } else {
         const errorData = await response.json();

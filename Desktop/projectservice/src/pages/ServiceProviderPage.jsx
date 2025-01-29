@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Map, { Marker } from "react-map-gl";
-import 'mapbox-gl/dist/mapbox-gl.css'; 
+import "mapbox-gl/dist/mapbox-gl.css";
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client";
 
 const ServiceProviderPage = () => {
   const { service } = useParams(); // Get the service type from the URL
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userLatitude= localStorage.getItem("userLatitude")
-  const userLongitude= localStorage.getItem("userLongitude")
-  localStorage.removeItem("userLatitude")
-  localStorage.removeItem("userLongitude")
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedProvider, setSelectedProvider] = useState(null);
+  const [message, setMessage] = useState("");
+  const [stompClient, setStompClient] = useState(null);
+  const email = localStorage.getItem("userEmail")
   useEffect(() => {
+    // Fetch service providers from the backend
     const fetchProviders = async () => {
+      console.log("customer: "+email);
       try {
-        const response = await fetch(`http://localhost:8080/api/service-providers?service=${service}`, {
-          method: "GET",
-          credentials: "include",
-        });
+        const response = await fetch(
+          `http://localhost:8080/api/service-providers?service=${service}`,
+          { method: "GET", credentials: "include" }
+        );
         const data = await response.json();
-
         if (Array.isArray(data)) {
           setProviders(data);
         } else {
@@ -33,7 +37,69 @@ const ServiceProviderPage = () => {
     };
 
     fetchProviders();
+
+    // Initialize WebSocket connection using SockJS
+    const client = new Client({
+      webSocketFactory: () => new SockJS("http://localhost:8080/ws"), // SockJS WebSocket endpoint
+      connectHeaders: {
+        "user-email": email, // 🔥 Customer's email sent in the header
+      },
+      debug: (msg) => console.log("STOMP Debug:", msg),
+      onConnect: () => {
+        console.log("STOMP connection established");
+      },
+      onStompError: (frame) => {
+        console.error("STOMP error:", frame.headers["message"]);
+        console.error("Additional details:", frame.body);
+      },
+      onWebSocketError: (error) => {
+        console.error("WebSocket error:", error);
+      },
+      onWebSocketClose: () => {
+        console.log("WebSocket connection closed");
+      },
+    });
+
+    client.activate();
+    setStompClient(client);
+
+    // Cleanup WebSocket connection when the component unmounts
+    return () => {
+      client.deactivate();
+    };
   }, [service]);
+
+  const handleContactClick = (provider) => {
+    setSelectedProvider(provider);
+    setShowPopup(true);
+  };
+
+  const handleSendMessage = () => {
+    if (!message.trim()) {
+      alert("Please enter a message.");
+      return;
+    }
+
+    if (stompClient && stompClient.connected) {
+      const payload = {
+        providerEmail: selectedProvider.email, // Provider's email
+        message, // Message content
+      };
+      console.log(payload);
+      stompClient.publish({
+        destination: "/app/send-message",
+        body: JSON.stringify(payload),
+      });
+
+      console.log(`Message sent to ${selectedProvider.email}:`, message);
+
+      // Close the popup and reset the message
+      setShowPopup(false);
+      setMessage("");
+    } else {
+      alert("STOMP connection is not open. Please try again later.");
+    }
+  };
 
   if (loading) {
     return <div className="text-center text-white">Loading service providers...</div>;
@@ -53,31 +119,17 @@ const ServiceProviderPage = () => {
           mapboxAccessToken={process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}
           mapStyle="mapbox://styles/mapbox/streets-v9"
         >
-          <Marker
-            longitude={73.911}
-            latitude={18.549}
-            anchor="center"
-          >
-            <div
-                style={{
-                  width: "10px",
-                  height: "10px",
-                  backgroundColor: "blue",
-                  borderRadius: "50%", // Makes it a circle
-                }}
-              />
-          </Marker>
-          {/* Custom Red Dot Marker */}
-          {Array.isArray(providers) && providers.map((provider, index) => (
-            <Marker
+          {Array.isArray(providers) &&
+            providers.map((provider, index) => (
+              <Marker
                 key={index}
                 longitude={provider.longitude}
                 latitude={provider.latitude}
-                anchor="bottom" // Ensures the marker stays at its location relative to the map
+                anchor="bottom"
               >
-                <div className="text-lg text-blue-500">📍</div> 
+                <div className="text-lg text-blue-500">📍</div>
               </Marker>
-          ))}
+            ))}
         </Map>
       </div>
 
@@ -90,7 +142,6 @@ const ServiceProviderPage = () => {
         <div className="space-y-8">
           {Array.isArray(providers) &&
             providers.map((provider, index) => (
-              
               <div
                 key={index}
                 className="bg-gray-800 p-6 rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-2xl transform transition-all duration-300 hover:scale-105 cursor-pointer"
@@ -104,14 +155,11 @@ const ServiceProviderPage = () => {
                 <p className="text-gray-300 mb-2">
                   <span className="font-semibold text-yellow-500">Email:</span> {provider.email}
                 </p>
-                <p className="text-gray-300 mb-2">
-                  <span className="font-semibold text-yellow-500">Service:</span> {provider.service}
-                </p>
-                <p className="text-gray-300 mb-2">
-                  <span className="font-semibold text-yellow-500">Distance:</span> {provider.distance}
-                </p>
                 <div className="mt-4">
-                  <button className="bg-yellow-500 text-gray-800 py-2 px-4 rounded-md font-semibold shadow-md hover:bg-yellow-400 transition-all duration-300">
+                  <button
+                    className="bg-yellow-500 text-gray-800 py-2 px-4 rounded-md font-semibold shadow-md hover:bg-yellow-400 transition-all duration-300"
+                    onClick={() => handleContactClick(provider)}
+                  >
                     Contact Provider
                   </button>
                 </div>
@@ -119,6 +167,38 @@ const ServiceProviderPage = () => {
             ))}
         </div>
       </div>
+
+      {/* Popup Window */}
+      {showPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white text-gray-800 p-6 rounded-lg shadow-lg w-1/3">
+            <h2 className="text-xl font-bold mb-4">
+              Send a message to {selectedProvider.fname} {selectedProvider.lname}
+            </h2>
+            <textarea
+              className="w-full p-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              rows="4"
+              placeholder="Type your message here..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <div className="flex justify-end space-x-4">
+              <button
+                className="bg-gray-300 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-400"
+                onClick={() => setShowPopup(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-yellow-500 text-gray-800 py-2 px-4 rounded-md font-semibold shadow-md hover:bg-yellow-400"
+                onClick={handleSendMessage}
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
