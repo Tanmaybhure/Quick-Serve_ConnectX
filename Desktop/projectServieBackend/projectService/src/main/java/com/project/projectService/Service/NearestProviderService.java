@@ -42,15 +42,14 @@ public class NearestProviderService {
         List<ReturnServiceProvider> nearestProvider= new ArrayList<>();
         lat1=Double.parseDouble(latitude);
         lon1=Double.parseDouble(longitude);
-        System.out.println(lat1+" "+lon1+" "+service);
+//        System.out.println(lat1+" "+lon1+" "+service);
         for(locationServiceProvider obj: allSpList){
             double lat2= Double.parseDouble(obj.getLatitude());
             double lon2= Double.parseDouble(obj.getLongitude());
             double distance= calculateDistance(lat2,lon2);
-            System.out.println(distance);
             if(distance<=Double.MAX_VALUE){
                 String currEmail= obj.getEmail();
-                System.out.println(distance+"     "+currEmail);
+//                System.out.println(distance+"     "+currEmail);
                 ServiceProvider newObj= Servicerepo.findByEmail(currEmail);
                 ReturnServiceProvider newTobeAdd= new ReturnServiceProvider();
                 newTobeAdd.setId(newObj.getId());
@@ -62,12 +61,12 @@ public class NearestProviderService {
                 newTobeAdd.setLongitude(lon2+"");
                 newTobeAdd.setPassword("**");
                 newTobeAdd.setDistance(Math.ceil(distance)+"");
-                System.out.println(distance+"     "+newObj.getFname()+" "+newObj.getLname()+" "+newObj.getFname()+" "+newObj.getService());
+//                System.out.println(distance+"     "+newObj.getFname()+" "+newObj.getLname()+" "+newObj.getFname()+" "+newObj.getService());
                 nearestProvider.add(newTobeAdd);
             }
         }
-        for(ReturnServiceProvider s: nearestProvider) System.out.println(s.getFname()+" "+s.getLname()+" "+s.getService());
-//        nearestProvider.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getDistance())));
+//        for(ReturnServiceProvider s: nearestProvider) System.out.println(s.getFname()+" "+s.getLname()+" "+s.getService());
+////        nearestProvider.sort(Comparator.comparingInt(a -> Integer.parseInt(a.getDistance())));
         return nearestProvider;
     }
 }
