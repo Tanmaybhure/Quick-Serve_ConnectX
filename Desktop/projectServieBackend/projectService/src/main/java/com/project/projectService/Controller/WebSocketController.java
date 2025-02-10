@@ -1,6 +1,8 @@
 package com.project.projectService.Controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.project.projectService.DTO.MessageRequestDTO;
+import com.project.projectService.DTO.ServiceResponseDTO;
 import com.project.projectService.Service.NotificationService;
 import com.project.projectService.webSocket.WebSocketUserRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +62,15 @@ public class WebSocketController {
             System.out.println("❌ Cannot Send Message: No Principal Found!");
         }
     }
+    @MessageMapping("/service-response")
+    public void sendAcceptResponse(@Payload ServiceResponseDTO serviceResponseDTO){
+        notificationService.sendToCustomer(serviceResponseDTO);
+    }
 
+    @MessageMapping("/customer-response")
+    public void sendAgainResponse(@Payload ServiceResponseDTO serviceResponseDTO){
+        notificationService.SendCustomerToProvider(serviceResponseDTO);
+    }
 }
 
 
